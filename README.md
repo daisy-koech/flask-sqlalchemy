@@ -57,3 +57,19 @@
 - reps
 - sets
 - duration_seconds
+
+## API Endpoints
+Workout Endpoints
+- GET/workouts - Retrieve all workouts.
+- GET/workouts/<id> - Retrieve a specific workout by its ID.
+- POST/workouts - Create a new workout.
+- DELETE/workouts/<id> - Delete a workout by its ID.
+
+Exercise Endpoints
+- GET/exercises - Retrieve all exercises.
+- GET/exercises/<id> - Retrieve a specific exercise by its ID.
+- POST/exercises - Create a new exercise.
+- DELETE/exercises/<id> - Delete an exercise by its ID.
+
+WorkoutExercise Endpoint
+- POST/workouts/<workout_id>/exercises/<exercise_id>/workout_exercises - Add an exercise to a workout
