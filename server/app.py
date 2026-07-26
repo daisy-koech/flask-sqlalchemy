@@ -1,3 +1,4 @@
+from schemas import (workout_schema, workouts_schema, exercise_schema, exercises_schema, workout_exercise_schema, workout_exercises_schema)
 from flask import Flask, make_response, request
 from flask_migrate import Migrate
 from models import db, Workout, Exercise, WorkoutExercise
@@ -15,17 +16,7 @@ migrate = Migrate(app, db)
 @app.route("/workouts", methods=["GET"])
 def get_workouts():
     workouts = Workout.query.all()
-
-    response = []
-
-    for workout in workouts:
-        response.append({
-            "id": workout.id,
-            "date": workout.date,
-            "duration_minutes": workout.duration_minutes,
-            "notes": workout.notes
-        })
-    return make_response(response, 200)
+    return make_response(workouts_schema.dump(workouts), 200)
 
 #GET one workout
 @app.route("/workouts/<id>", methods=["GET"])
