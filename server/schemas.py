@@ -13,8 +13,16 @@ class WorkoutExerciseSchema(Schema):
 #exercise schema
 class ExerciseSchema(Schema):
     id = fields.Int(dump_only=True)
-    name = fields.Str(required=True)
-    category = fields.Str(required=True)
+    name = fields.Str(
+    required=True,
+    error={"required": "Exercise name is required."},
+    validate=validate.Length(min=2)
+    )   
+    category = fields.Str(
+    required=True,
+    validate=validate.OneOf(["Strength", "Cardio", "Flexibility", "Balance"],
+            error="Invalid category.")
+    )
     equipment_needed = fields.Bool(required=True)
     workout_exercises = fields.Nested(WorkoutExerciseSchema, many=True)
 
