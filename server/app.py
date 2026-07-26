@@ -77,7 +77,7 @@ def add_exercise_to_workout(workout_id, exercise_id):
 
     db.session.add(workout_exercise)
     db.session.commit()
-    return make_response({"message": "Exercise added to workout"}, 201)
+    return make_response(workout_exercise_schema.dump(workout_exercise), 201)
 
 #GET (exercises)
 @app.route("/exercises", methods=["GET"])
