@@ -1,3 +1,4 @@
+from schemas import (workout_schema, workouts_schema, exercise_schema, exercises_schema, workout_exercise_schema, workout_exercises_schema)
 from flask import Flask, make_response, request
 from flask_migrate import Migrate
 from models import db, Workout, Exercise, WorkoutExercise
@@ -15,45 +16,35 @@ migrate = Migrate(app, db)
 @app.route("/workouts", methods=["GET"])
 def get_workouts():
     workouts = Workout.query.all()
-
-    response = []
-
-    for workout in workouts:
-        response.append({
-            "id": workout.id,
-            "date": workout.date,
-            "duration_minutes": workout.duration_minutes,
-            "notes": workout.notes
-        })
-    return make_response(response, 200)
+    return make_response(workouts_schema.dump(workouts), 200)
 
 #GET one workout
-@app.route("/workouts/<id>", methods=["GET"])
+@app.route("/workouts/<int:id>", methods=["GET"])
 def get_workout(id):
     workout = Workout.query.get(id)
 
     if not workout:
         return {"error": "Workout not found"}, 404
-    return {
-        "id": workout.id,
-        "date": workout.date,
-        "duration_minutes": workout.duration_minutes,
-        "notes": workout.notes
-    }, 200
+    return make_response(workout_schema.dump(workout),200)
 
 #POST
 @app.route("/workouts", methods=["POST"])
 def create_workout():
     data = request.get_json()
+
+    errors = workout_schema.validate(data)
+    if errors:
+        return make_response(errors, 400)
+
     workout = Workout(
         date=data["date"],
         duration_minutes=data["duration_minutes"],
         notes=data.get("notes")
     )
-
     db.session.add(workout)
-    db.session.commit()    
-    return make_response({"message": "Workout created"}, 201)
+    db.session.commit()
+
+    return make_response(workout_schema.dump(workout), 201)
 
 #DELETE
 @app.route("/workouts/<id>", methods=["DELETE"])
@@ -86,23 +77,16 @@ def add_exercise_to_workout(workout_id, exercise_id):
 
     db.session.add(workout_exercise)
     db.session.commit()
-    return make_response({"message": "Exercise added to workout"}, 201)
+    return make_response(workout_exercise_schema.dump(workout_exercise), 201)
 
 #GET (exercises)
 @app.route("/exercises", methods=["GET"])
 def get_exercises():
     exercises = Exercise.query.all()
-
-    response = []
-
-    for exercise in exercises:
-        response.append({
-            "id": exercise.id,
-            "name": exercise.name,
-            "category": exercise.category,
-            "equipment_needed": exercise.equipment_needed
-        })
-    return make_response(response, 200)
+    return make_response(
+        exercises_schema.dump(exercises),
+        200
+    )
 
 #GET one exerciose
 @app.route("/exercises/<id>", methods=["GET"])
@@ -118,18 +102,17 @@ def get_exercise(id):
             "date": str(workout.date),
             "duration_minutes": workout.duration_minutes
         })
-    return {
-        "id": exercise.id,
-        "name": exercise.name,
-        "category": exercise.category,
-        "equipment_needed": exercise.equipment_needed,
-        "workouts": workouts
-    }, 200
+    return make_response(exercise_schema.dump(exercise), 200)
 
 #CREATE exercise
 @app.route("/exercises", methods=["POST"])
 def create_exercise():
     data = request.get_json()
+
+    errors = exercise_schema.validate(data)
+    if errors:
+        return make_response(errors, 400)
+
     exercise = Exercise(
         name=data["name"],
         category=data["category"],
@@ -137,7 +120,7 @@ def create_exercise():
     )
     db.session.add(exercise)
     db.session.commit()
-    return make_response({"message": "Exercise created"}, 201)
+    return make_response(exercise_schema.dump(exercise), 201)
 
 #DELETE exercise
 @app.route("/exercises/<id>", methods=["DELETE"])
