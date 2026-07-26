@@ -108,6 +108,11 @@ def get_exercise(id):
 @app.route("/exercises", methods=["POST"])
 def create_exercise():
     data = request.get_json()
+
+    errors = exercise_schema.validate(data)
+    if errors:
+        return make_response(errors, 400)
+
     exercise = Exercise(
         name=data["name"],
         category=data["category"],
@@ -115,7 +120,7 @@ def create_exercise():
     )
     db.session.add(exercise)
     db.session.commit()
-    return make_response({"message": "Exercise created"}, 201)
+    return make_response(exercise_schema.dump(exercise), 201)
 
 #DELETE exercise
 @app.route("/exercises/<id>", methods=["DELETE"])
