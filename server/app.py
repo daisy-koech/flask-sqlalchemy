@@ -19,18 +19,13 @@ def get_workouts():
     return make_response(workouts_schema.dump(workouts), 200)
 
 #GET one workout
-@app.route("/workouts/<id>", methods=["GET"])
+@app.route("/workouts/<int:id>", methods=["GET"])
 def get_workout(id):
     workout = Workout.query.get(id)
 
     if not workout:
         return {"error": "Workout not found"}, 404
-    return {
-        "id": workout.id,
-        "date": workout.date,
-        "duration_minutes": workout.duration_minutes,
-        "notes": workout.notes
-    }, 200
+    return make_response(workout_schema.dump(workout),200)
 
 #POST
 @app.route("/workouts", methods=["POST"])
