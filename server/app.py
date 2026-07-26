@@ -31,15 +31,20 @@ def get_workout(id):
 @app.route("/workouts", methods=["POST"])
 def create_workout():
     data = request.get_json()
+    
+    errors = workout_schema.validate(data)
+    if errors:
+        return make_response(errors, 400)
+
     workout = Workout(
         date=data["date"],
         duration_minutes=data["duration_minutes"],
         notes=data.get("notes")
     )
-
     db.session.add(workout)
-    db.session.commit()    
-    return make_response({"message": "Workout created"}, 201)
+    db.session.commit()
+
+    return make_response(workout_schema.dump(workout), 201)
 
 #DELETE
 @app.route("/workouts/<id>", methods=["DELETE"])
