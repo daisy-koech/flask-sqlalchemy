@@ -31,7 +31,7 @@ def get_workout(id):
 @app.route("/workouts", methods=["POST"])
 def create_workout():
     data = request.get_json()
-    
+
     errors = workout_schema.validate(data)
     if errors:
         return make_response(errors, 400)
@@ -83,17 +83,10 @@ def add_exercise_to_workout(workout_id, exercise_id):
 @app.route("/exercises", methods=["GET"])
 def get_exercises():
     exercises = Exercise.query.all()
-
-    response = []
-
-    for exercise in exercises:
-        response.append({
-            "id": exercise.id,
-            "name": exercise.name,
-            "category": exercise.category,
-            "equipment_needed": exercise.equipment_needed
-        })
-    return make_response(response, 200)
+    return make_response(
+        exercises_schema.dump(exercises),
+        200
+    )
 
 #GET one exerciose
 @app.route("/exercises/<id>", methods=["GET"])
@@ -109,13 +102,7 @@ def get_exercise(id):
             "date": str(workout.date),
             "duration_minutes": workout.duration_minutes
         })
-    return {
-        "id": exercise.id,
-        "name": exercise.name,
-        "category": exercise.category,
-        "equipment_needed": exercise.equipment_needed,
-        "workouts": workouts
-    }, 200
+    return make_response(exercise_schema.dump(exercise), 200)
 
 #CREATE exercise
 @app.route("/exercises", methods=["POST"])
