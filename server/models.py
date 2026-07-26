@@ -20,7 +20,7 @@ class Exercise(db.Model):
 
     @validates("name")
     def validate_name(self, key, name):
-        if not name or name.strip():
+        if not name or not name.strip():
             raise ValueError(
                 "Exercise name cannot be empty"
             )
